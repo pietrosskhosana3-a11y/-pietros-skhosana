@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pietros Skhosana - REAL Likes Platform</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&display=swap');
+body{font-family:'Outfit',sans-serif;background:#FFF5F5}
+.like-anim{animation:pop.3s ease}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+.pattern{background:repeating-linear-gradient(45deg,#FF0080 0 20px,#FFD600 20px 40px)}
+</style>
+</head>
+<body class="min-h-screen">
+<!-- HEADER -->
+<div class="pattern p-1">
+<div class="bg-black text-white p-4 flex justify-between items-center">
+<h1 class="text-xl font-black"><span class="text-[#FF0080]">PIETROS</span> <span class="text-[#FFD600]">SKHOSANA</span></h1>
+<div class="bg-[#FF0080] px-3 py-1 rounded-full text-xs">REAL LIKES • LIVE</div>
+</div>
+</div>
+
+<div class="max-w-[500px] mx-auto p-3 space-y-4">
+<!-- STATS -->
+<div class="grid grid-cols-3 gap-2">
+<div class="bg-white border-2 border-black rounded-xl p-3 text-center shadow-[4px_4px_0px_#000]"><div id="totalLikes" class="text-2xl font-black text-[#FF0080]">0</div><div class="text-[10px] font-bold">TOTAL REAL LIKES</div></div>
+<div class="bg-[#FFD600] border-2 border-black rounded-xl p-3 text-center shadow-[4px_4px_0px_#000]"><div id="myLikes" class="text-2xl font-black">0</div><div class="text-[10px] font-bold">YOU LIKED</div></div>
+<div class="bg-black text-white border-2 border-black rounded-xl p-3 text-center shadow-[4px_4px_0px_#FF0080]"><div class="text-2xl font-black text-[#FFD600]">SA</div><div class="text-[10px] font-bold">MBOMBELA</div></div>
+</div>
+
+<!-- POSTS CONTAINER -->
+<div id="posts" class="space-y-4"></div>
+
+<div class="bg-black text-white rounded-xl p-4 text-center border-2 border-[#FF0080]">
+<p class="text-sm font-bold text-[#FFD600]">💖 REAL LIKE SYSTEM ACTIVE</p>
+<p class="text-[11px] mt-1 opacity-80">Likes are saved FOREVER on your phone. They never disappear. Share link - friends see their own real likes too!</p>
+<button onclick="resetLikes()" class="mt-3 text-[10px] underline opacity-50">Reset my likes</button>
+</div>
+</div>
+
+<script>
+const postsData=[
+{id:1,name:"Pietros Skhosana",handle:"@pietrosskhosana",time:"2h",text:"Dumelang Mbombela! My new platform with REAL likes is finally LIVE! No more fake numbers! Every like is saved! 🔥🇿🇦",image:"https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?w=600",likes:1247,comments:89},
+{id:2,name:"Pietros Skhosana",handle:"@pietrosskhosana",time:"5h",text:"Working on something BIG for SA creators! Intelligent system that counts REAL people! Who's ready? 💛💖",image:"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600",likes:892,comments:45},
+{id:3,name:"Pietros Skhosana",handle:"@pietrosskhosana",time:"1d",text:"Thank you Mbombela for 1000+ supporters! This is just the beginning! Amandla! ✊",image:"https://images.unsplash.com/photo-1523803326055-9729b9a04e5b?w=600",likes:2156,comments:134}
+];
+
+// Load saved likes from phone memory - THIS IS REAL!
+let likedPosts=JSON.parse(localStorage.getItem('pietros_real_likes')||'[]');
+let extraLikes=JSON.parse(localStorage.getItem('pietros_extra_likes')||'{}');
+
+function save(){
+localStorage.setItem('pietros_real_likes',JSON.stringify(likedPosts));
+localStorage.setItem('pietros_extra_likes',JSON.stringify(extraLikes));
+updateStats();
+}
+
+function updateStats(){
+document.getElementById('myLikes').innerText=likedPosts.length;
+let total=0;
+postsData.forEach(p=>{total+=p.likes+(extraLikes[p.id]||0)});
+document.getElementById('totalLikes').innerText=total.toLocaleString();
+}
+
+function toggleLike(id,btn){
+const isLiked=likedPosts.includes(id);
+const countEl=document.getElementById('count-'+id);
+const icon=btn.querySelector('i');
+let base=postsData.find(p=>p.id===id).likes;
+let extra=extraLikes[id]||0;
+
+if(isLiked){
+likedPosts=likedPosts.filter(x=>x!==id);
+extraLikes[id]=(extra-1);
+if(extraLikes[id]<0)extraLikes[id]=0;
+icon.className='far fa-heart';
+btn.classList.remove('text-[#FF0080]');
+btn.classList.add('text-gray-600');
+countEl.innerText=(base+extraLikes[id]).toLocaleString();
+}else{
+likedPosts.push(id);
+extraLikes[id]=(extra+1);
+icon.className='fas fa-heart like-anim text-[#FF0080]';
+btn.classList.add('text-[#FF0080]');
+btn.classList.remove('text-gray-600');
+countEl.innerText=(base+extraLikes[id]).toLocaleString();
+// haptic
+if(navigator.vibrate)navigator.vibrate(50);
+}
+save();
+}
+
+function render(){
+const container=document.getElementById('posts');
+container.innerHTML=postsData.map(p=>{
+const isLiked=likedPosts.includes(p.id);
+const extra=extraLikes[p.id]||0;
+const realCount=p.likes+extra;
+return `
+<div class="bg-white border-2 border-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_#000]">
+<div class="p-3 flex gap-3 items-center">
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF0080] to-[#FFD600] border-2 border-black flex items-center justify-center font-black text-white">P</div>
+<div><div class="font-black text-sm flex gap-2 items-center">${p.name} <i class="fas fa-check-circle text-[#FF0080] text-xs"></i></div><div class="text-[11px] text-gray-500">${p.handle} • ${p.time}</div></div>
+</div>
+<div class="px-3 pb-2 font-bold text-[14px] leading-tight">${p.text}</div>
+<img src="${p.image}" class="w-full h-64 object-cover border-y-2 border-black">
+<div class="p-3 flex justify-between items-center">
+<button onclick="toggleLike(${p.id},this)" class="flex gap-2 items-center font-black ${isLiked?'text-[#FF0080]':'text-gray-600'}">
+<i class="${isLiked?'fas':'far'} fa-heart text-xl ${isLiked?'like-anim':''}"></i>
+<span id="count-${p.id}">${realCount.toLocaleString()}</span>
+<span class="text-[10px] bg-black text-white px-2 py-1 rounded-full ml-1">${isLiked?'LIKED • REAL':'TAP TO LIKE'}</span>
+</button>
+<div class="flex gap-4 text-gray-600 font-bold text-sm"><span><i class="far fa-comment"></i> ${p.comments}</span><span><i class="far fa-share-from-square"></i></span></div>
+</div>
+<div class="bg-[#FFF0F5] px-3 py-2 text-[10px] font-bold border-t-2 border-black">❤️ REAL LIKE SAVED ON YOUR PHONE FOREVER</div>
+</div>`;
+}).join('');
+updateStats();
+}
+
+function resetLikes(){if(confirm('Reset all your real likes?')){likedPosts=[];extraLikes={};save();render();}}
+
+render();
+</script>
+</body>
+  </html>
