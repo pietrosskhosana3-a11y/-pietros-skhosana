@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pietros-skhosana-pietros-skhosana.vercel.app/sitemap.xml
